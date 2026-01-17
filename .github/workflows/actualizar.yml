@@ -1,0 +1,32 @@
+name: Actualizar Resultados
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # Se ejecuta cada 30 minutos
+  workflow_dispatch: # Botón para darle manual si quieres
+
+permissions:
+  contents: write
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Ejecutar Robot
+        run: python scraper.py
+
+      - name: Guardar cambios
+        run: |
+          git config --global user.name 'Robot Bolita'
+          git config --global user.email 'robot@github.com'
+          git add datos.json
+          git commit -m "Resultados actualizados" || exit 0
+          git push
